@@ -22,7 +22,7 @@ class Game extends React.Component{
     }
   }
   handleInput(e){
-    let string = e.target.value
+    let string = e.target != undefined ? e.target.value : e
     let output = ''
 
     for (var i = 0; i < string.length; i++) {
@@ -37,8 +37,8 @@ class Game extends React.Component{
         letter = alphabet[(index + this.state.caesar) % alphabet.length]
         // check if it was upper- or lowercase and adjust
         output += isUpperCase(original_letter) ? letter : letter.toLowerCase()
-      }else if(letter.match(/ /) != null){
-        // it's a space
+      }else{
+        // it's a different char
         output += letter
       }
     }
@@ -49,9 +49,8 @@ class Game extends React.Component{
     })
   }
   handleSelect(e){
-    console.log(e.target.value);
-    this.setState({
-      caesar: parseInt(e.target.value)
+    this.setState({ caesar: parseInt(e.target.value) }, function(){
+      this.handleInput($('#ta-input').val())
     })
   }
   createOptions(){
@@ -65,11 +64,11 @@ class Game extends React.Component{
 	render() {
 		return (
       <div>
-        <textarea onChange={this.handleInput.bind(this)}/>
-        <textarea value={this.state.word} />
         <select value={this.state.caesar} onChange={this.handleSelect.bind(this)}>
           {this.createOptions()}
         </select>
+        <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
+        <textarea value={this.state.word} id='ta-output' />
       </div>
 		);
 	}
