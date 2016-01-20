@@ -1,5 +1,3 @@
-# React init
+# Szyfr
 
-Minimal react bolerplate
-
-with Browserify, Sass, and classnames for react
+Substitution cipher deciphering tool 
