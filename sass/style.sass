@@ -1,8 +1,8 @@
 @import _normalize
 @import ../node_modules/bourbon/app/assets/stylesheets/_bourbon
 
-$bg: #6c6c6c
-$blue: #4C71FA
+$bg: #313131
+$blue: #f7f7f7
 
 body
   background: $bg
@@ -10,10 +10,34 @@ body
   padding: 1em
 
 textarea
-  width: 20em
+  display: block
+  width: 30em
   height: 5em
   margin-top: 1em
   margin-left: 4em
+  font-family: monospace
+  font-size: 1.4em
 
-select
+select#caesar-select
   display: block
+
+.modes > div
+  opacity: .1
+  pointer-events: none
+  &.mode-visible
+    opacity: 1
+    pointer-events: initial
+
+.substitutions
+  div
+    display: inline-block
+    margin-right: 1em
+    margin-bottom: 1em
+    min-width: 8em
+    > span
+      min-width: 4.3em
+      display: inline-block
+      span
+        margin-right: .3em
+    select
+      margin-left: .5em
