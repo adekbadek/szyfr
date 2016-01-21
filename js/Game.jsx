@@ -69,28 +69,46 @@ class Game extends React.Component{
       let key = keybase+'-'+i
       if(letters){
         options.push(<option value={alphabet[i]} key={key}>{alphabet[i]}</option>);
+        if(i == alphabet.length-1){
+          options.push(<option value='-' key={key+'-dash'}>-</option>)
+        }
       }else{
-        options.push(<option value={i} key={key}>{i}</option>);
+        options.push(<option value={i} key={key}>{i}</option>)
       }
     }
     return options
   }
   handleSubstChange(e){
-    let substitutions_array = this.state.substitution
-    // console.log($('#'+e.target.id).parent());
-    substitutions_array[alphabet.indexOf(e.target.id)][1] = e.target.value
+    let sub_array = this.state.substitution
+    let sub_pair = sub_array[alphabet.indexOf(e.target.id)]
+    // set new value
+    sub_pair[1] = e.target.value
+    // update State
     this.setState({
-      substitution: substitutions_array
+      substitution: sub_array
     }, function(){
-      if(this.state.substitution[alphabet.indexOf(e.target.id)][0] == this.state.substitution[alphabet.indexOf(e.target.id)][1]){
+      // check for un-changed X=X when changing a letter to X
+      for (var i = 0; i < sub_array.length; i++) {
+        if(e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]){
+          $($('#'+e.target.value).parent()).addClass('conflict')
+          // update State for conflicted select
+          sub_array[i][1] = '-'
+          this.setState({substitution: sub_array}, function(){
+            // manually setting the value - just for looks
+            $('#'+e.target.value).val('-')
+          })
+        }
+      }
+      // UI - highlight the changed select
+      if(sub_pair[0] == sub_pair[1]){
         $($('#'+e.target.id).parent()).removeClass('changed')
       }else{
-        $($('#'+e.target.id).parent()).addClass('changed')
+        $($('#'+e.target.id).parent()).addClass('changed').removeClass('conflict')
       }
-      console.log(this.state.substitution[alphabet.indexOf(e.target.id)]);
+      // console.log(sub_pair);
+      // update I/O
       this.handleInput($('#ta-input').val())
     })
-
   }
   createSubstitutionsUI(){
     let subst_ui = []
@@ -98,12 +116,12 @@ class Game extends React.Component{
       let key = 'subst-'+i
       subst_ui.push(
         <div key={key}>
-          <span>{this.state.substitution[i][0]} → </span>
+          <span>{this.state.substitution[i][0]} <span className='html-ent'>&#8594;</span></span>
           <select id={this.state.substitution[i][0]} defaultValue={this.state.substitution[i][0]} onChange={this.handleSubstChange.bind(this)}>
             {this.createOptions('subs-opts', true)}
           </select>
         </div>
-      );
+      )
     }
     return subst_ui
   }

@@ -1,13 +1,21 @@
 @import _normalize
 @import ../node_modules/bourbon/app/assets/stylesheets/_bourbon
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300)
 
 $bg: #313131
+$grey: #DADADA
+$black: #0E0E0E
 $white: #f7f7f7
+$conflict: #ff5d5d
 
 body
-  background: $bg
-  color: $white
   padding: 1em
+  font-family: 'Source Sans Pro', sans-serif
+  color: $white
+  background: $bg
+
+.html-ent
+  font-family: sans-serif
 
 textarea
   display: block
@@ -33,17 +41,18 @@ select#caesar-select
     display: inline-block
     margin-right: 1em
     margin-bottom: 1em
-    border: 1px solid
-    border-color: transparent
     border-radius: 4px
     padding: 3px
+    @include transition(all 200ms)
     &.changed
-      border-color: $white
+      color: $black
+      background: $grey
+    &.conflict
+      background: $conflict
     > span
-      min-width: 2.7em
+      min-width: 2.6em
       display: inline-block
       > span
-        min-width: 1em
         display: inline-block
       span
         margin-right: .3em
