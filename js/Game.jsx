@@ -11,12 +11,10 @@ const init_substitution = function(alphabet){
   return init_s
 }
 
-
 const isUpperCase = function(character){
   if (character == character.toUpperCase()) { return true }
   if (character == character.toLowerCase()){ return false }
 }
-
 
 class Game extends React.Component{
   constructor(props){
@@ -36,19 +34,15 @@ class Game extends React.Component{
       // for each letter in input area
       let letter = string[i]
       if(letter.match(/[A-Za-a]/gi) != null){
-        // check if it's a letter
+        // it's a letter
         let original_letter = letter
         // and find it's index in the alphabet
         let index = alphabet.indexOf(letter.toUpperCase())
         if(this.state.mode == 'substitution'){
-
-          console.log('sub mode, the pair:')
-          console.log(this.state.substitution[index]);
+          // substitution mode
           letter = this.state.substitution[index][1]
-          // letter = alphabet[(index + this.state.caesar) % alphabet.length]
-
         }else if(this.state.mode == 'caesar'){
-          // change the letter caesar style - modulo!
+          // caesar mode
           letter = alphabet[(index + this.state.caesar) % alphabet.length]
         }
         // check if it was upper- or lowercase and adjust
@@ -64,7 +58,7 @@ class Game extends React.Component{
       word: output
     })
   }
-  handleSelect(e){
+  handleCaesarSelect(e){
     this.setState({ caesar: parseInt(e.target.value) }, function(){
       this.handleInput($('#ta-input').val())
     })
@@ -82,13 +76,17 @@ class Game extends React.Component{
     return options
   }
   handleSubstChange(e){
-    console.log("letter: "+e.target.id+" will become: "+e.target.value);
-
     let substitutions_array = this.state.substitution
+    // console.log($('#'+e.target.id).parent());
     substitutions_array[alphabet.indexOf(e.target.id)][1] = e.target.value
     this.setState({
       substitution: substitutions_array
     }, function(){
+      if(this.state.substitution[alphabet.indexOf(e.target.id)][0] == this.state.substitution[alphabet.indexOf(e.target.id)][1]){
+        $($('#'+e.target.id).parent()).removeClass('changed')
+      }else{
+        $($('#'+e.target.id).parent()).addClass('changed')
+      }
       console.log(this.state.substitution[alphabet.indexOf(e.target.id)]);
       this.handleInput($('#ta-input').val())
     })
@@ -100,7 +98,7 @@ class Game extends React.Component{
       let key = 'subst-'+i
       subst_ui.push(
         <div key={key}>
-          <span>letter: {this.state.substitution[i][0]}</span>
+          <span>{this.state.substitution[i][0]} → </span>
           <select id={this.state.substitution[i][0]} defaultValue={this.state.substitution[i][0]} onChange={this.handleSubstChange.bind(this)}>
             {this.createOptions('subs-opts', true)}
           </select>
@@ -110,7 +108,9 @@ class Game extends React.Component{
     return subst_ui
   }
   handleModeChange(e){
-    this.setState({mode:e.target.value})
+    this.setState({mode:e.target.value}, function(){
+      this.handleInput($('#ta-input').val())
+    })
   }
   setCheckedAttr(mode){
     if(mode == this.state.mode){ return 'defaultChecked' }
@@ -122,7 +122,7 @@ class Game extends React.Component{
 		return (
       <div>
         <div>
-          <h2>Choose mode:</h2>
+          <h2>Mode:</h2>
           <form id="choose" onChange={this.handleModeChange.bind(this)}>
             <input type="radio" name="mode" value="substitution"
             defaultChecked={this.state.mode == 'substitution'} /> Substitutions <br />
@@ -141,7 +141,7 @@ class Game extends React.Component{
 
           <div className={this.setClass('caesar')}>
             <h2>Caesar:</h2>
-            <select value={this.state.caesar} onChange={this.handleSelect.bind(this)} id="caesar-select">
+            <select value={this.state.caesar} onChange={this.handleCaesarSelect.bind(this)} id="caesar-select">
             {this.createOptions('opts', false)}
             </select>
           </div>

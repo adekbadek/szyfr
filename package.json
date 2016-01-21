@@ -1,7 +1,7 @@
 {
-  "name": "react-init",
+  "name": "szyfr",
   "version": "1.0.0",
-  "description": "Minimal boilerplate",
+  "description": "Substitution cipher deciphering tool",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
