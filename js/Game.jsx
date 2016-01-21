@@ -15,7 +15,7 @@ const init_substitution = function(alphabet){
 // check if letter is uppercase
 const isUpperCase = function(character){
   if (character == character.toUpperCase()) { return true }
-  if (character == character.toLowerCase()){ return false }
+  if (character == character.toLowerCase()) { return false }
 }
 
 // Frequency count - how many times each letter appears in a string
@@ -29,6 +29,7 @@ const freq_count = function(str){
     return acc
   }, {})
 
+  // returns an object with data and an array with just the letters sorted by frequency
   return {
     counted: counted,
     keys_sorted: Object.keys(counted).sort(function(a,b){return counted[a]-counted[b]}).reverse()
@@ -164,10 +165,11 @@ class Game extends React.Component{
     let subst_ui = []
     for (var i = 0; i < this.state.substitution.length; i++) {
       let key = 'subst-'+i
+      let letter = this.state.substitution[i][0]
       subst_ui.push(
         <div key={key}>
-          <span>{this.state.substitution[i][0]} <span className='html-ent'>&#8594;</span></span>
-          <select id={this.state.substitution[i][0]} defaultValue={this.state.substitution[i][0]} onChange={this.handleSubstChange.bind(this)}>
+          <span>{letter} <span className='html-ent'>&#8594;</span></span>
+          <select id={letter} defaultValue={letter} onChange={this.handleSubstChange.bind(this)}>
             {this.createOptions('subs-opts', true)}
           </select>
         </div>
