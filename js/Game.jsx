@@ -3,6 +3,7 @@ import ReactDOM from "react-dom"
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 
+// Create initial substitution - every letter is substituted by itself (e.g. A=A, B=B, etc.)
 const init_substitution = function(alphabet){
   let init_s = []
   for (var i = 0; i < alphabet.length; i++) {
@@ -11,6 +12,7 @@ const init_substitution = function(alphabet){
   return init_s
 }
 
+// check if letter is uppercase
 const isUpperCase = function(character){
   if (character == character.toUpperCase()) { return true }
   if (character == character.toLowerCase()){ return false }
@@ -19,6 +21,7 @@ const isUpperCase = function(character){
 class Game extends React.Component{
   constructor(props){
     super(props)
+    // set initial State
     this.state = {
       word: '',
       caesar: 1,
@@ -26,6 +29,7 @@ class Game extends React.Component{
       mode: 'substitution'
     }
   }
+  // Handle the first textbox input
   handleInput(e){
     let string = e.target != undefined ? e.target.value : e
     let output = ''
@@ -58,18 +62,23 @@ class Game extends React.Component{
       word: output
     })
   }
+  // Select for how many letters the caesar shifts
   handleCaesarSelect(e){
     this.setState({ caesar: parseInt(e.target.value) }, function(){
+      // update the deciphering
       this.handleInput($('#ta-input').val())
     })
   }
+  // Create options for a select element
   createOptions(keybase, letters){
     var options = [];
     for (var i = 0; i < alphabet.length; i++) {
+      // in React, iteratively created elements must have key props
       let key = keybase+'-'+i
       if(letters){
         options.push(<option value={alphabet[i]} key={key}>{alphabet[i]}</option>);
         if(i == alphabet.length-1){
+          // push last option - a dash for replacing conflicting letters
           options.push(<option value='-' key={key+'-dash'}>-</option>)
         }
       }else{
@@ -87,29 +96,29 @@ class Game extends React.Component{
     this.setState({
       substitution: sub_array
     }, function(){
-      // check for un-changed X=X when changing a letter to X
+      // check for conflicts - when X=X changing another letter to X
       for (var i = 0; i < sub_array.length; i++) {
         if(e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]){
           $($('#'+e.target.value).parent()).addClass('conflict')
           // update State for conflicted select
           sub_array[i][1] = '-'
           this.setState({substitution: sub_array}, function(){
-            // manually setting the value - just for looks
+            // set the value
             $('#'+e.target.value).val('-')
           })
         }
       }
-      // UI - highlight the changed select
+      // UI - highlight the changed select and remove conflict class
       if(sub_pair[0] == sub_pair[1]){
         $($('#'+e.target.id).parent()).removeClass('changed')
       }else{
         $($('#'+e.target.id).parent()).addClass('changed').removeClass('conflict')
       }
-      // console.log(sub_pair);
       // update I/O
       this.handleInput($('#ta-input').val())
     })
   }
+  // The UI - selects for each letter in the alphabet
   createSubstitutionsUI(){
     let subst_ui = []
     for (var i = 0; i < this.state.substitution.length; i++) {
@@ -125,17 +134,20 @@ class Game extends React.Component{
     }
     return subst_ui
   }
+  // Choose mode - Substitutions or Caesar
   handleModeChange(e){
     this.setState({mode:e.target.value}, function(){
       this.handleInput($('#ta-input').val())
     })
   }
+  // helpers for setting attrs and classes
   setCheckedAttr(mode){
     if(mode == this.state.mode){ return 'defaultChecked' }
   }
   setClass(mode){
     if(mode == this.state.mode){ return 'mode-visible' }
   }
+  // Finally, render the component
 	render() {
 		return (
       <div>
