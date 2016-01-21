@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
 
-// Create initial substitution - every letter is substituted by itself (e.g. A=A, B=B, etc.)
+// Create initial substitution - every letter is substituted with itself (e.g. A=A, B=B, etc.)
 const init_substitution = function(alphabet){
   let init_s = []
   for (var i = 0; i < alphabet.length; i++) {
@@ -18,6 +18,23 @@ const isUpperCase = function(character){
   if (character == character.toLowerCase()){ return false }
 }
 
+// Frequency count - how many times each letter appears in a string
+const freq_count = function(str){
+  let counted = str.replace(/[^A-Za-z]/g, '').toUpperCase().split('').reduce(function (acc, curr) {
+    if (typeof acc[curr] == 'undefined') {
+      acc[curr] = 1
+    } else {
+      acc[curr] += 1
+    }
+    return acc
+  }, {})
+
+  return {
+    counted: counted,
+    keys_sorted: Object.keys(counted).sort(function(a,b){return counted[a]-counted[b]}).reverse()
+  }
+}
+
 class Game extends React.Component{
   constructor(props){
     super(props)
@@ -26,7 +43,8 @@ class Game extends React.Component{
       word: '',
       caesar: 1,
       substitution: init_substitution(alphabet),
-      mode: 'substitution'
+      mode: 'substitution',
+      freq_str: ''
     }
   }
   // Handle the first textbox input
@@ -57,9 +75,10 @@ class Game extends React.Component{
       }
     }
 
-    // set component state
+    // set component state - output word and frequency count
     this.setState({
-      word: output
+      word: output,
+      freq_str: freq_count(string).keys_sorted.join('')
     })
   }
   // Select for how many letters the caesar shifts
@@ -170,9 +189,9 @@ class Game extends React.Component{
           <h2>Mode:</h2>
           <form id="choose" onChange={this.handleModeChange.bind(this)}>
             <input type="radio" name="mode" value="substitution"
-            defaultChecked={this.state.mode == 'substitution'} /> Substitutions <br />
+              defaultChecked={this.state.mode == 'substitution'} /> Substitutions <br />
             <input type="radio" name="mode" value="caesar"
-            defaultChecked={this.state.mode == 'caesar'} /> Caesar
+              defaultChecked={this.state.mode == 'caesar'} /> Caesar
           </form>
         </div>
 
@@ -194,8 +213,11 @@ class Game extends React.Component{
 
         <div>
           <h2>I/O:</h2>
-          <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
-          <textarea value={this.state.word} id='ta-output' />
+          <div id="io">
+            <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
+            <textarea value={this.state.word} id='ta-output' />
+            <div id="io-freqstr">{this.state.freq_str}</div>
+          </div>
         </div>
       </div>
     );

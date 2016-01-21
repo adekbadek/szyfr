@@ -18,24 +18,26 @@ body
 .html-ent
   font-family: sans-serif
 
+#io
+  margin-left: 4em
+  font-family: monospace
+#io-freqstr
+  margin-top: 1rem
+  font-size: 1.7em
+
 textarea
   display: block
   width: 30em
   height: 5em
   margin-top: 1em
-  margin-left: 4em
-  font-family: monospace
-  font-size: 1.4em
+  margin-left: 0
+  font-size: 1.3em
 
 select#caesar-select
   display: block
 
-.modes > div
-  opacity: .1
-  pointer-events: none
-  &.mode-visible
-    opacity: 1
-    pointer-events: initial
+.modes > div:not(.mode-visible)
+  display: none
 
 .substitutions
   div
@@ -58,7 +60,7 @@ select#caesar-select
       > span
         display: inline-block
         &:first-child
-          min-width: .7em      
+          min-width: .7em
       span
         margin-right: .3em
     select
