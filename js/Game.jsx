@@ -162,13 +162,6 @@ class Game extends React.Component{
       this.handleInput($('#ta-input').val())
     })
   }
-  // helpers for setting attrs and classes
-  setCheckedAttr(mode){
-    if(mode == this.state.mode){ return 'defaultChecked' }
-  }
-  setClass(mode){
-    if(mode == this.state.mode){ return 'mode-visible' }
-  }
   // Finally, render the component
 	render() {
 		return (
@@ -184,14 +177,14 @@ class Game extends React.Component{
         </div>
 
         <div className='modes'>
-          <div className={this.setClass('substitution')}>
+          <div className={this.state.mode == 'substitution' ? 'mode-visible' : null }>
             <h2>Substitutions:</h2>
             <div className="substitutions">
             {this.createSubstitutionsUI()}
             </div>
           </div>
 
-          <div className={this.setClass('caesar')}>
+          <div className={this.state.mode == 'caesar' ? 'mode-visible' : null }>
             <h2>Caesar:</h2>
             <select value={this.state.caesar} onChange={this.handleCaesarSelect.bind(this)} id="caesar-select">
             {this.createOptions('opts', false)}
