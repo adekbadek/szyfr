@@ -96,7 +96,7 @@ class Game extends React.Component{
     this.setState({
       substitution: sub_array
     }, function(){
-      // check for initial conflicts - when A=A, then changing setting B=A
+      // check for initial conflicts - setting B=A while initially A=A
       for (var i = 0; i < sub_array.length; i++) {
         if(e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]){
           $($('#'+e.target.value).parent()).addClass('conflict')
@@ -108,6 +108,23 @@ class Game extends React.Component{
           })
         }
       }
+
+      // Check for further conflicts - setting C=B while A=B
+      $('.warning').removeClass('warning')  // reset warning class
+      for (var i = 0; i < sub_array.length; i++) {
+        let checked_letter = sub_array[i][1]
+        if(checked_letter != '-'){  // check only letters
+          for (var k = 0; k < sub_array.length; k++) {
+            if(k != i){ // omit self
+              // for each elem[1] in array, check if it's conflicting
+              if(checked_letter == sub_array[k][1]){
+                $($('#'+sub_array[k][0]).parent()).addClass('warning')
+              }
+            }
+          }
+        }
+      }
+
       // UI - highlight the changed select and remove conflict class
       if(sub_pair[0] == sub_pair[1]){
         $($('#'+e.target.id).parent()).removeClass('changed')
