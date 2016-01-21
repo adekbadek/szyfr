@@ -96,7 +96,7 @@ class Game extends React.Component{
     this.setState({
       substitution: sub_array
     }, function(){
-      // check for conflicts - when X=X changing another letter to X
+      // check for initial conflicts - when A=A, then changing setting B=A
       for (var i = 0; i < sub_array.length; i++) {
         if(e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]){
           $($('#'+e.target.value).parent()).addClass('conflict')
@@ -112,7 +112,12 @@ class Game extends React.Component{
       if(sub_pair[0] == sub_pair[1]){
         $($('#'+e.target.id).parent()).removeClass('changed')
       }else{
-        $($('#'+e.target.id).parent()).addClass('changed').removeClass('conflict')
+        let $item = $('#'+e.target.id)
+        $($item.parent()).addClass('changed')
+        if($item.val() != $item.attr('id')){
+          // no conflict anymore - remove conflict class
+          $($item.parent()).removeClass('conflict')
+        }
       }
       // update I/O
       this.handleInput($('#ta-input').val())
