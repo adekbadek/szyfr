@@ -34,13 +34,8 @@ const freq_count = function(str){
     counted_sorted.push([keys_sorted[i] ,counted[keys_sorted[i]]])
   }
 
-  // returns an object with data and an array with just the letters sorted by frequency
-  return {counted, keys_sorted, counted_sorted}
+  return counted_sorted
 }
-
-let test = freq_count("Hello World how are you doing today?")
-console.log(test);
-console.log(test.counted[test.keys_sorted[0]]);
 
 class Game extends React.Component{
   constructor(props){
@@ -85,7 +80,7 @@ class Game extends React.Component{
     // set component state - output word and frequency count
     this.setState({
       word: output,
-      freq: freq_count(string).counted_sorted
+      freq: freq_count(string)
     })
   }
   // Select for how many letters the caesar shifts
@@ -197,10 +192,14 @@ class Game extends React.Component{
   // Table that displays the frequencies of letters in the cryptogram (input)
   createFreqTable(freq){
     let freq_html = []
+    let max = 0 // find maximum
+    for (var j = 0; j < freq.length; j++) {
+      if(freq[j][1] > max){max = freq[j][1]}
+    }
     for (var i = 0; i < freq.length; i++) {
       freq_html.push(
         <div key={"freq_html-"+i}>
-          <span className={parseInt(freq[i][1]) > 1 ? null : 'dimmed'}>{freq[i][1]}</span>
+          <span style={{opacity: freq[i][1] / max}}>{freq[i][1]}</span>
         <br/>{freq[i][0]}</div>
       )
     }
