@@ -2,6 +2,8 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
+const freq_english = ["e","t","a","o","i","n","s","h","r","d","l","c","u","m","w","f","g","y","p","b","v","k","j","x","q","z"]
+
 
 // Create initial substitution - every letter is substituted with itself (e.g. A=A, B=B, etc.)
 const init_substitution = function(alphabet){
@@ -218,7 +220,8 @@ class Game extends React.Component{
           <div id="io">
             <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
             <textarea value={this.state.word} id='ta-output' />
-            <div id="io-freqstr">{this.state.freq_str}</div>
+            <div id="io-freqstr">{this.state.freq_str.split('').join(' ')}</div>
+            <div id="io-freq-english">{freq_english.join(' ').toUpperCase()}</div>
           </div>
         </div>
       </div>
