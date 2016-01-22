@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom"
 
 const alphabet = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"]
-const freq_english = ["e","t","a","o","i","n","s","h","r","d","l","c","u","m","w","f","g","y","p","b","v","k","j","x","q","z"]
+const freq_english = ["E","T","A","O","I","N","S","H","R","D","L","C","U","M","W","F","G","Y","P","B","V","K","J","X","Q","Z"]
 
 
 // Create initial substitution - every letter is substituted with itself (e.g. A=A, B=B, etc.)
@@ -23,20 +23,24 @@ const isUpperCase = function(character){
 // Frequency count - how many times each letter appears in a string
 const freq_count = function(str){
   let counted = str.replace(/[^A-Za-z]/g, '').toUpperCase().split('').reduce(function (acc, curr) {
-    if (typeof acc[curr] == 'undefined') {
-      acc[curr] = 1
-    } else {
-      acc[curr] += 1
-    }
+    if (typeof acc[curr] == 'undefined') {acc[curr] = 1} else {acc[curr] += 1}
     return acc
   }, {})
 
-  // returns an object with data and an array with just the letters sorted by frequency
-  return {
-    counted: counted,
-    keys_sorted: Object.keys(counted).sort(function(a,b){return counted[a]-counted[b]}).reverse()
+  let keys_sorted = Object.keys(counted).sort(function(a,b){return counted[a]-counted[b]}).reverse()
+
+  let counted_sorted = []
+  for (var i = 0; i < keys_sorted.length; i++) {
+    counted_sorted.push([keys_sorted[i] ,counted[keys_sorted[i]]])
   }
+
+  // returns an object with data and an array with just the letters sorted by frequency
+  return {counted, keys_sorted, counted_sorted}
 }
+
+let test = freq_count("Hello World how are you doing today?")
+console.log(test);
+console.log(test.counted[test.keys_sorted[0]]);
 
 class Game extends React.Component{
   constructor(props){
@@ -47,7 +51,7 @@ class Game extends React.Component{
       caesar: 1,
       substitution: init_substitution(alphabet),
       mode: 'substitution',
-      freq_str: ''
+      freq: []
     }
   }
   // Handle the first textbox input
@@ -81,7 +85,7 @@ class Game extends React.Component{
     // set component state - output word and frequency count
     this.setState({
       word: output,
-      freq_str: freq_count(string).keys_sorted.join('')
+      freq: freq_count(string).counted_sorted
     })
   }
   // Select for how many letters the caesar shifts
@@ -190,6 +194,18 @@ class Game extends React.Component{
       this.handleInput($('#ta-input').val())
     })
   }
+  // Table that displays the frequencies of letters in the cryptogram (input)
+  createFreqTable(freq){
+    let freq_html = []
+    for (var i = 0; i < freq.length; i++) {
+      freq_html.push(
+        <div key={"freq_html-"+i}>
+          <span className={parseInt(freq[i][1]) > 1 ? null : 'dimmed'}>{freq[i][1]}</span>
+        <br/>{freq[i][0]}</div>
+      )
+    }
+    return freq_html
+  }
   // Finally, render the component
 	render() {
 		return (
@@ -225,8 +241,8 @@ class Game extends React.Component{
           <div id="io">
             <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
             <textarea value={this.state.word} id='ta-output' />
-            <div id="io-freqstr">{this.state.freq_str.split('').join(' ')}</div>
-            <div id="io-freq-english">{freq_english.join(' ').toUpperCase()}</div>
+            <div id="io-freqstr">{this.createFreqTable(this.state.freq)}</div>
+            <div id="io-freq-english">{freq_english.join(' ')}</div>
           </div>
         </div>
       </div>
