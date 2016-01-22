@@ -120,7 +120,10 @@ class Game extends React.Component{
     }, function(){
       // check for initial conflicts - setting B=A while initially A=A
       for (var i = 0; i < sub_array.length; i++) {
-        if(e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]){
+        if(
+          e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]
+          && e.target.value != e.target.id // allow changing back to initial
+        ){
           $($('#'+e.target.value).parent()).addClass('conflict')
           // update State for conflicted select
           sub_array[i][1] = '-'
@@ -128,6 +131,8 @@ class Game extends React.Component{
             // set the value
             $('#'+e.target.value).val('-')
           })
+        }else if(e.target.value == e.target.id){
+          $($('#'+e.target.value).parent()).removeClass('conflict')
         }
       }
 
