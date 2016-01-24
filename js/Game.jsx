@@ -92,7 +92,15 @@ class Game extends React.Component{
   }
   changeCeasar(increase){
     let val = parseInt($('#caesar-select').val())
-    val = increase ? val+1 : val-1
+    if(val === 0){
+      val = increase ? val+1 : alphabet.length-1
+      console.log('case 1');
+    }else if(val === alphabet.length){
+      val = increase ? 0 : val-1
+      console.log('case 2');
+    }else{
+      val = increase ? val+1 : val-1
+    }
     $('#caesar-select').val(val)
     this.setState({ caesar: val }, function(){
       // update the deciphering
