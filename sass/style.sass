@@ -42,13 +42,17 @@ textarea
   font-size: 1.3em
 
 button
-  border: 1px solid white
+  border: 1px solid $white
   background: none
-  color: white
+  color: $white
   margin: 10px 10px 0 0
-  border-radius: 50%
-  width: 2em
-  height: 2em
+  border-radius: 3px
+  &:hover, &:focus
+    background: rgba($white, .3)
+  &.circle
+    border-radius: 50%
+    width: 2em
+    height: 2em
 
 select#caesar-select
   display: inline-block

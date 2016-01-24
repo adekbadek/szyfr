@@ -192,6 +192,19 @@ class Game extends React.Component{
     }
     return subst_ui
   }
+  resetSubstitutions(e){
+    console.log('reset subs')
+    $('.substitutions select').each(function(){
+      let $sel = $(this)
+      $sel.val($sel.attr('id'))
+    })
+    $('.substitutions > div').removeClass('warning conflict changed')
+    this.setState({
+      substitution: init_substitution(alphabet)
+    }, function(){
+      this.handleInput($('#ta-input').val())
+    })
+  }
   // Choose mode - Substitutions or Caesar
   handleModeChange(e){
     this.setState({mode:e.target.value}, function(){
@@ -234,6 +247,7 @@ class Game extends React.Component{
             <div className="substitutions">
             {this.createSubstitutionsUI()}
             </div>
+            <button onClick={this.resetSubstitutions.bind(this)}>reset</button>
           </div>
 
           <div className={this.state.mode == 'caesar' ? 'mode-visible' : null }>
@@ -241,8 +255,8 @@ class Game extends React.Component{
             <select value={this.state.caesar} onChange={this.handleCaesarSelect.bind(this)} id="caesar-select">
             {this.createOptions('opts', false)}
             </select>
-            <button onClick={this.changeCeasar.bind(this, false)}>-</button>
-            <button onClick={this.changeCeasar.bind(this, true)}>+</button>
+            <button onClick={this.changeCeasar.bind(this, false)} className="circle">-</button>
+            <button onClick={this.changeCeasar.bind(this, true)} className="circle">+</button>
           </div>
         </div>
 
