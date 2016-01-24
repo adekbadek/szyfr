@@ -90,6 +90,15 @@ class Game extends React.Component{
       this.handleInput($('#ta-input').val())
     })
   }
+  changeCeasar(increase){
+    let val = parseInt($('#caesar-select').val())
+    val = increase ? val+1 : val-1
+    $('#caesar-select').val(val)
+    this.setState({ caesar: val }, function(){
+      // update the deciphering
+      this.handleInput($('#ta-input').val())
+    })
+  }
   // Create options for a select element
   createOptions(keybase, letters){
     var options = [];
@@ -232,6 +241,8 @@ class Game extends React.Component{
             <select value={this.state.caesar} onChange={this.handleCaesarSelect.bind(this)} id="caesar-select">
             {this.createOptions('opts', false)}
             </select>
+            <button onClick={this.changeCeasar.bind(this, false)}>-</button>
+            <button onClick={this.changeCeasar.bind(this, true)}>+</button>
           </div>
         </div>
 
