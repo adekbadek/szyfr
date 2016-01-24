@@ -238,8 +238,8 @@ class Game extends React.Component{
         <div>
           <h2>I/O:</h2>
           <div id="io">
-            <textarea onChange={this.handleInput.bind(this)} id='ta-input' />
-            <textarea value={this.state.word} id='ta-output' />
+            <textarea spellCheck="false" onChange={this.handleInput.bind(this)} id='ta-input' />
+            <textarea spellCheck="false" value={this.state.word} id='ta-output' />
             <div id="io-freqstr">{this.createFreqTable(this.state.freq)}</div>
             <div id="io-freq-english">{freq_english.join(' ')}</div>
           </div>
