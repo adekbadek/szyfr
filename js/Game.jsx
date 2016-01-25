@@ -21,20 +21,22 @@ const isUpperCase = function(character){
 }
 
 // Frequency count - how many times each letter appears in a string
+const sort_obj = function(obj){
+  let keys_sorted = Object.keys(obj).sort(function(a,b){return obj[a]-obj[b]}).reverse()
+
+  let obj_sorted = []
+  for (var i = 0; i < keys_sorted.length; i++) {
+    obj_sorted.push([keys_sorted[i] ,obj[keys_sorted[i]]])
+  }
+  return obj_sorted
+}
 const freq_count = function(str){
   let counted = str.replace(/[^A-Za-z]/g, '').toUpperCase().split('').reduce(function (acc, curr) {
     if (typeof acc[curr] == 'undefined') {acc[curr] = 1} else {acc[curr] += 1}
     return acc
   }, {})
 
-  let keys_sorted = Object.keys(counted).sort(function(a,b){return counted[a]-counted[b]}).reverse()
-
-  let counted_sorted = []
-  for (var i = 0; i < keys_sorted.length; i++) {
-    counted_sorted.push([keys_sorted[i] ,counted[keys_sorted[i]]])
-  }
-
-  return counted_sorted
+  return sort_obj(counted)
 }
 
 class Game extends React.Component{
@@ -45,43 +47,87 @@ class Game extends React.Component{
       word: '',
       caesar: 1,
       substitution: init_substitution(alphabet),
-      mode: 'substitution',
+      substitution_symbols: {},
+      mode: 'substitution-symbols',
       freq: []
     }
   }
-  // Handle the first textbox input
+  // Handle the upper textbox - the input
   handleInput(e){
     let string = e.target != undefined ? e.target.value : e
     let output = ''
 
-    for (var i = 0; i < string.length; i++) {
-      // for each letter in input area
-      let letter = string[i]
-      if(letter.match(/[A-Za-a]/gi) != null){
-        // it's a letter
-        let original_letter = letter
-        // and find it's index in the alphabet
-        let index = alphabet.indexOf(letter.toUpperCase())
-        if(this.state.mode == 'substitution'){
-          // substitution mode
-          letter = this.state.substitution[index][1]
-        }else if(this.state.mode == 'caesar'){
-          // caesar mode
-          letter = alphabet[(index + this.state.caesar) % alphabet.length]
-        }
-        // check if it was upper- or lowercase and adjust
-        output += isUpperCase(original_letter) ? letter : letter.toLowerCase()
-      }else{
-        // it's a different char
-        output += letter
-      }
-    }
+    if(this.state.mode == 'substitution' || this.state.mode == 'caesar'){
 
-    // set component state - output word and frequency count
-    this.setState({
-      word: output,
-      freq: freq_count(string)
-    })
+      // for each letter in input area
+      for (var i = 0; i < string.length; i++) {
+        let letter = string[i]
+        if(letter.match(/[A-Za-a]/gi) != null){
+          // it's a letter
+          let original_letter = letter
+          // and find it's index in the alphabet
+          let index = alphabet.indexOf(letter.toUpperCase())
+          if(this.state.mode == 'substitution'){
+            // substitution mode
+            letter = this.state.substitution[index][1]
+          }else if(this.state.mode == 'caesar'){
+            // caesar mode
+            letter = alphabet[(index + this.state.caesar) % alphabet.length]
+          }
+          // check if it was upper- or lowercase and adjust
+          output += isUpperCase(original_letter) ? letter : letter.toLowerCase()
+        }else{
+          // it's a different char
+          output += letter
+        }
+      }
+
+      // set component state - output word and frequency count
+      this.setState({
+        word: output,
+        freq: freq_count(string)
+      })
+
+    }else if(this.state.mode == 'substitution-symbols' && string.length > 1){
+      // a symbol is a set of characters divided by a space
+
+      let updated_symbols = {}
+      let symbols_snapshot = this.state.substitution_symbols
+
+      this.setState({
+        substitution_symbols: {}
+      }, function(){
+
+        let freq_obj = {}
+
+        let symbols = string.trim().split(' ')
+        for (var i = 0; i < symbols.length; i++) {
+          let val_for_symbol = '-'  // set default val for new symbol, then change if we already have the symbol
+          if(symbols_snapshot[symbols[i]]){
+            val_for_symbol = symbols_snapshot[symbols[i]]
+          }
+          updated_symbols[symbols[i]] = val_for_symbol  // set val
+
+          // build output string
+          output += val_for_symbol + ' '
+
+          // frequency count
+          if(freq_obj[symbols[i]] != undefined){
+            freq_obj[symbols[i]] += 1
+          }else{
+            freq_obj[symbols[i]] = 1
+          }
+        }
+
+        // change output
+        this.setState({
+          substitution_symbols: updated_symbols,
+          word: output,
+          freq: sort_obj(freq_obj)
+        })
+
+      })
+    }
   }
   // Select for how many letters the caesar shifts
   handleCaesarSelect(e){
@@ -108,7 +154,7 @@ class Game extends React.Component{
     })
   }
   // Create options for a select element
-  createOptions(keybase, letters){
+  createAplhabetOptions(keybase, letters){
     var options = [];
     for (var i = 0; i < alphabet.length; i++) {
       // in React, iteratively created elements must have key props
@@ -134,7 +180,8 @@ class Game extends React.Component{
     this.setState({
       substitution: sub_array
     }, function(){
-      // check for initial conflicts - setting B=A while initially A=A
+
+      // Check for initial conflicts - setting B=A while initially A=A
       for (var i = 0; i < sub_array.length; i++) {
         if(
           e.target.value == sub_array[i][0] && sub_array[i][0] == sub_array[i][1]
@@ -183,6 +230,21 @@ class Game extends React.Component{
       this.handleInput($('#ta-input').val())
     })
   }
+  handleSubstSymbolChange(e){
+
+    let sub_sym_obj = this.state.substitution_symbols
+    sub_sym_obj[e.target.id] = e.target.value
+    // update State
+    this.setState({
+      substitution_symbols: sub_sym_obj
+    })
+
+    // TODO: handle conflict, warning, and changed classes
+
+    // update I/O
+    this.handleInput($('#ta-input').val())
+
+  }
   // The UI - selects for each letter in the alphabet
   createSubstitutionsUI(){
     let subst_ui = []
@@ -193,10 +255,32 @@ class Game extends React.Component{
         <div key={key}>
           <span>{letter} <span className='html-ent'>&#8594;</span></span>
           <select id={letter} defaultValue={letter} onChange={this.handleSubstChange.bind(this)}>
-            {this.createOptions('subs-opts', true)}
+            {this.createAplhabetOptions('subs-opts', true)}
           </select>
         </div>
       )
+    }
+    return subst_ui
+  }
+  // The UI - selects for each symbol
+  createSubstitutionsSymbolsUI(){
+    let subst_ui = []
+    let i = 0
+    for(var symbol in this.state.substitution_symbols){
+      let react_key = 'subst-s-'+i
+      subst_ui.push(
+        <div key={react_key}>
+          <span>{symbol} <span className='html-ent'>&#8594;</span></span>
+          <select
+            id={symbol}
+            defaultValue={this.state.substitution_symbols[symbol]}
+            onChange={this.handleSubstSymbolChange.bind(this)}
+          >
+            {this.createAplhabetOptions('subs-s-opts', true)}
+          </select>
+        </div>
+      )
+      i++
     }
     return subst_ui
   }
@@ -212,6 +296,12 @@ class Game extends React.Component{
     }, function(){
       this.handleInput($('#ta-input').val())
     })
+  }
+  resetSubstitutionsSymbols(e){
+
+    console.log('TODO: reset subs-symbols')
+    // TODO: Reset should re-parse the input...
+
   }
   // Choose mode - Substitutions or Caesar
   handleModeChange(e){
@@ -238,12 +328,14 @@ class Game extends React.Component{
   // Finally, render the component
 	render() {
 		return (
-      <div>
+      <div className={'mode-'+this.state.mode}>
         <div>
           <h2>Mode:</h2>
           <form id="choose" onChange={this.handleModeChange.bind(this)}>
             <input type="radio" name="mode" value="substitution"
               defaultChecked={this.state.mode == 'substitution'} /> Substitutions <br />
+            <input type="radio" name="mode" value="substitution-symbols"
+              defaultChecked={this.state.mode == 'substitution-symbols'} /> Substitutions - Symbols <br />
             <input type="radio" name="mode" value="caesar"
               defaultChecked={this.state.mode == 'caesar'} /> Caesar
           </form>
@@ -258,10 +350,18 @@ class Game extends React.Component{
             <button onClick={this.resetSubstitutions.bind(this)}>reset</button>
           </div>
 
+          <div className={this.state.mode == 'substitution-symbols' ? 'mode-visible' : null }>
+            <h2>Substitutions - Symbols:</h2>
+            <div className="substitutions-symbols">
+            {this.createSubstitutionsSymbolsUI()}
+            </div>
+            <button onClick={this.resetSubstitutionsSymbols.bind(this)}>reset</button>
+          </div>
+
           <div className={this.state.mode == 'caesar' ? 'mode-visible' : null }>
             <h2>Caesar:</h2>
             <select value={this.state.caesar} onChange={this.handleCaesarSelect.bind(this)} id="caesar-select">
-            {this.createOptions('opts', false)}
+            {this.createAplhabetOptions('opts', false)}
             </select>
             <button onClick={this.changeCeasar.bind(this, false)} className="circle">-</button>
             <button onClick={this.changeCeasar.bind(this, true)} className="circle">+</button>
