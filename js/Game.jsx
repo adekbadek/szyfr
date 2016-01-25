@@ -88,7 +88,7 @@ class Game extends React.Component{
         freq: freq_count(string)
       })
 
-    }else if(this.state.mode == 'substitution-symbols' && string.length > 1){
+    }else if(this.state.mode == 'substitution-symbols' && string.length > 0){
       // a symbol is a set of characters divided by a space
 
       let updated_symbols = {}
